@@ -17,7 +17,6 @@ async function get_wikipedia_ja_link (word) {
 
 /**
  * Wikipediaの記事名の付け方に従って英数字、記号を半角に変換
- * https://ja.wikipedia.org/wiki/Wikipedia:%E8%A8%98%E4%BA%8B%E5%90%8D%E3%81%AE%E4%BB%98%E3%81%91%E6%96%B9#%E8%A8%98%E4%BA%8B%E5%90%8D%E3%81%AE%E6%9B%B8%E5%BC%8F
  * @param {string} str 文字列
  * @return {string} 全角→半角に変換された文字列
  */
