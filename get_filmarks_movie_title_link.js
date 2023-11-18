@@ -18,12 +18,13 @@ async function get_filmarks_movie_title_link (title) {
     } catch (e) {
         return "";
     }
-    const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("p-content-cassette");
+    //const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("p-content-cassette");
+    const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("js-movie-cassette");
     //console.log(elms);
     for (const elm of elms) {
         const title_elm = elm.getElementsByClassName("p-content-cassette__title");
         const movie_title = title_elm[0].textContent;
-        const movie_id = JSON.parse(elm.dataset.clip).movie_id;
+        const movie_id = JSON.parse(elm.getAttribute('data-clip')).movie_id;
         if (title == movie_title) {
             return create_markdown_link(movie_title, movie_id);
         }
