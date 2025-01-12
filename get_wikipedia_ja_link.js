@@ -4,7 +4,7 @@
  * @returns {string} Wikipedia日本語版の該当記事へのMarkdownリンク文字列
  */
 async function get_wikipedia_ja_link (word) {
-    const url = "https://ja.wikipedia.org/wiki/" + encodeURIComponent(toHalfWidth(word));
+    const url = "https://ja.wikipedia.org/wiki/" + encodeURIComponent(toHalfWidth(extractQuoted(word)));
     let res;
     try {
         res = await request(url);
@@ -13,6 +13,21 @@ async function get_wikipedia_ja_link (word) {
     }
     const elms = new DOMParser().parseFromString(res, "text/html").getElementsByTagName("title");
     return "[" + elms[0].textContent + "](" + url + ")";
+}
+
+/**
+ * 鉤括弧または二重鉤括弧の中身を抽出
+ * @param {string} str 文字列
+ * @returns 
+ */
+function extractQuoted(str) {
+    // 鉤括弧「」または二重鉤括弧『』の中身を抽出する正規表現
+    const match = str.match(/(?:「([^」]*)」|『([^』]*)』)/);
+    if (match) {
+        // 最初の捕捉グループまたは2番目の捕捉グループを返す
+        return match[1] || match[2];
+    }
+    return str;
 }
 
 /**

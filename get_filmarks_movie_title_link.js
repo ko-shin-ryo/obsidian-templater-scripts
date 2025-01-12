@@ -5,8 +5,9 @@
  */
 async function get_filmarks_movie_title_link (title) {
     if (!title) return "";
+    const title_body = extractQuoted(title)
     // Filmarks検索結果から対象作品のIDを取得する
-    const url = "https://filmarks.com/search/movies?q=" + encodeURIComponent(title);
+    const url = "https://filmarks.com/search/movies?q=" + encodeURIComponent(title_body);
     let res;
     let min_distance = {
         distance: 100,
@@ -19,17 +20,18 @@ async function get_filmarks_movie_title_link (title) {
         return "";
     }
     //const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("p-content-cassette");
-    const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("js-movie-cassette");
+    //const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("js-movie-cassette");
+    const elms = new DOMParser().parseFromString(res, "text/html").getElementsByClassName("js-cassette");
     //console.log(elms);
     for (const elm of elms) {
         const title_elm = elm.getElementsByClassName("p-content-cassette__title");
         const movie_title = title_elm[0].textContent;
         const movie_id = JSON.parse(elm.getAttribute('data-clip')).movie_id;
-        if (title == movie_title) {
+        if (title_body == movie_title) {
             return create_markdown_link(movie_title, movie_id);
         }
         // 完全一致しない場合はレーベンシュタイン距離で類似度を求める
-        const distance = levenshtein_distance(title, movie_title);
+        const distance = levenshtein_distance(title_body, movie_title);
         if (distance < min_distance.distance) {
             min_distance.distance = distance;
             min_distance.movie_title = movie_title;
@@ -42,6 +44,21 @@ async function get_filmarks_movie_title_link (title) {
         return create_markdown_link(min_distance.movie_title, min_distance.movie_id);
     }
     return "";
+}
+
+/**
+ * 鉤括弧または二重鉤括弧の中身を抽出
+ * @param {string} str 文字列
+ * @returns 
+ */
+function extractQuoted(str) {
+    // 鉤括弧「」または二重鉤括弧『』の中身を抽出する正規表現
+    const match = str.match(/(?:「([^」]*)」|『([^』]*)』)/);
+    if (match) {
+        // 最初の捕捉グループまたは2番目の捕捉グループを返す
+        return match[1] || match[2];
+    }
+    return str;
 }
 
 /**
