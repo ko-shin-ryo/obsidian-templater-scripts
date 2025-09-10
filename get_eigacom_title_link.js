@@ -19,7 +19,7 @@ async function get_eigacom_title_link (title) {
     for (const elm of elms) {
         const movie_title = elm.querySelector('.col-s-3 .title').textContent.trim();
         const movie_id = elm.querySelector('.col-s-3 a').getAttribute('href').match(/\/movie\/(\d+)/)?.[1];
-        if (movie_title == title_body) {
+        if (compareIgnoringSpaces(title_body, movie_title)) {
             return create_markdown_link(movie_title, movie_id);
         }
     }
@@ -39,6 +39,18 @@ function extractQuoted(str) {
         return match[1] || match[2];
     }
     return str;
+}
+
+/**
+ * タイトル文字列を比較する
+ * 映画.comはスペースは全角を採用しているため、スペースを変換して比較する
+ * @param {string} title1 
+ * @param {string} title2
+ * @returns 
+ */
+function compareIgnoringSpaces(title1, title2) {
+  const normalizeSpaces = (str) => str.replace(/ /g, '　');
+  return normalizeSpaces(title1) === normalizeSpaces(title2);
 }
 
 /**
