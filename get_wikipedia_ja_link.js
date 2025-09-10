@@ -4,7 +4,7 @@
  * @returns {string} Wikipedia日本語版の該当記事へのMarkdownリンク文字列
  */
 async function get_wikipedia_ja_link (word) {
-    const url = "https://ja.wikipedia.org/wiki/" + encodeURIComponent(toHalfWidth(extractQuoted(word)));
+    const url = "https://ja.wikipedia.org/wiki/" + encodeURIComponent(toHalfWidth(extractQuoted(removeEmojis(word))));
     let res;
     try {
         res = await request(url);
@@ -13,6 +13,15 @@ async function get_wikipedia_ja_link (word) {
     }
     const elms = new DOMParser().parseFromString(res, "text/html").getElementsByTagName("title");
     return "[" + elms[0].textContent + "](" + url + ")";
+}
+
+/**
+ * 絵文字を削除
+ * @param {string} str 
+ * @returns 
+ */
+function removeEmojis(str) {
+    return str.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '');
 }
 
 /**
